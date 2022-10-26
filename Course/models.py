@@ -8,19 +8,17 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 # Create your models here.
 
 
-class Course():
+class Course(models.Model):
     """Hnadling courses model"""
     name = models.CharField(max_length=300)
-    #reviews = models.ManyToManyField(Review)
+    reviews = models.ManyToManyField('Review')
     price = models.IntegerField()
     includes = models.CharField(max_length=50)
     image = models.ImageField(upload_to='Courses images')
     description = models.TextField()
     overview = models.TextField()
-    #instructor = models.ManyToManyField(Instructor)
-    language = models.CharField(choices=[
-        'English', 'Arabic', 'German', 'French'
-    ])
+    instructor = models.ManyToManyField('Instructor')
+    language = models.CharField(max_length=30)
     rate = models.IntegerField(
         validators=[
             MaxValueValidator(5),
@@ -30,7 +28,7 @@ class Course():
     date = models.DateTimeField()
 
 
-class Instructor():
+class Instructor(models.Model):
     """Handling instructor model"""
     name = models.CharField(max_length=300)
     description=models.TextField()
@@ -38,7 +36,7 @@ class Instructor():
     courses=models.TextField() #hna al mfrod a5od al courses ali ll ragl dh
 
 
-class Review():
+class Review(models.Model):
     """Handling Reviews model"""
     name=models.CharField(max_length=300) #hna al mfrod a5od asm al user ali hy3ml al review
     comment=models.TextField()
