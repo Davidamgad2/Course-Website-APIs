@@ -4,9 +4,11 @@ from rest_framework.routers import DefaultRouter
 
 router=DefaultRouter()
 
+router.register('Course', views.Course)
+router.register('Instructor',views.Instructor)
+router.register('Review',views.Review)
 
 
 urlpatterns = [
-   # path(),
-
+path('',include(router.urls)),
 ]
