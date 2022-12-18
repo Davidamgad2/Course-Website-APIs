@@ -27,5 +27,20 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields=('name','comment','rate')
 
 
+class ContentSerializer(serializers.ModelSerializer):
+    """Handling serializers for content of the chapters"""
+    
+    class Meta:
+        model= models.Content
+        fields=('session','description','session_summary','attached_files')
+
+class ChapterSerializer(serializers.ModelSerializer):
+    """Handling serializer for the chapters"""
+
+    class Meta:
+      model= models.Chapter
+      fields=('chapter')  
+
+
 
     

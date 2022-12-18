@@ -1,17 +1,58 @@
-from random import choices
 from wsgiref.validate import validator
 from django.db import models
 from django.conf import settings
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator,FileExtensionValidator
 import datetime
 from django.db.models import Sum
 from django.db.models import F
-from ast import Delete
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.conf import settings
 # Create your models here.
 
+class UserProfileManager(BaseUserManager):
+    """manager for user profiles"""
+
+    def create_user(self, email, name, password=None):
+        """create a new user profile"""
+        if not email:
+            raise ValueError("User must choose Email Address")
+        email = self.normalize_email(email)
+        user = self.model(email=email, name=name)
+
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    # we need super user to have password
+    def create_superuser(self, email, name, password):
+        """create and save a new super user with given details"""
+        user = self.create_user(email, name, password)
+        user.is_superuser = True
+        user.is_staff = True
+        user.save(using=self._db)
+        return user
+
+
+class UserProfile(AbstractBaseUser, PermissionsMixin):
+    """database model for users in the system """
+    email = models.EmailField(max_length=225, unique=True)
+    name = models.CharField(max_length=255)
+    is_activate = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+
+    objects = UserProfileManager()
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['name']
+
+    def get_full_name(self):
+        """retrieve full name of user"""
+        return self.name
+
+
+    def __str__(self):
+        """return string represent of our user"""
+        return self.email
 
 class Course(models.Model):
     """Hnadling courses model"""
@@ -54,6 +95,30 @@ class Review(models.Model):
 
 
 
+class Content(models.Model):
+    """Handling the content of the course"""
+    session = models.FileField(upload_to='videos_uploaded',null=True,
+    validators=[FileExtensionValidator(allowed_extensions=['MOV','avi','mp4','webm','mkv'])])
+    description=models.TextField()
+    session_summary=models.TextField()
+    attached_files=models.FileField("Attached Files")
+    
+     
+
+class Chapter(models.Model):
+    """Handling the chapters of content"""
+    chapter=models.TextField()
+    content=models.ManyToManyField('content')
+
+
+class q_a(models.Model):
+    """Handling Q&A part"""
+
+
+
+
+
+
 class Cart(models.Model):
     """Handling cart model"""
     creation_date = models.DateTimeField(verbose_name=('creation date'))
@@ -89,7 +154,7 @@ class Cart(models.Model):
         return cart
 
     def add(self, product, unit_price, quantity=1):
-        item = models.Item.objects.filter(cart=self.cart, product=product).first()
+        item = models.Course.objects.filter(cart=self.cart, product=product).first()
         if item:
             item.unit_price = unit_price
             item.quantity += int(quantity)
@@ -98,14 +163,14 @@ class Cart(models.Model):
             models.Item.objects.create(cart=self.cart, product=product, unit_price=unit_price, quantity=quantity)
 
     def remove(self, product):
-        item = models.Item.objects.filter(cart=self.cart, product=product).first()
+        item = models.Course.objects.filter(cart=self.cart, product=product).first()
         if item:
             item.delete()
         else:
             raise ItemDoesNotExist
 
     def update(self, product, quantity, unit_price=None):
-        item = models.Item.objects.filter(cart=self.cart, product=product).first()
+        item = models.Course.objects.filter(cart=self.cart, product=product).first()
         if item:
             if quantity == 0:
                 item.delete()

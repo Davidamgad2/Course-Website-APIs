@@ -38,6 +38,31 @@ class Review(viewsets.ModelViewSet):
     """" Handling method for the review """
     serializer_class=Serializers.ReviewSerializer
     queryset=models.Review.objects.all()
+    
+    def perform_create(self, serializer):
+        return super().perform_create(serializer)
+    
+    def perform_destroy(self, instance):
+        return super().perform_destroy(instance)
+
+
+class Content(viewsets.ModelViewSet):
+    """" Handling method for the review """
+    serializer_class=Serializers.ContentSerializer
+    queryset=models.Review.objects.all()
+    
+    def perform_create(self, serializer):
+        return super().perform_create(serializer)
+    
+    def perform_destroy(self, instance):
+        return super().perform_destroy(instance)
+
+
+class Chapter(viewsets.ModelViewSet):
+    """" Handling method for the review """
+    serializer_class=Serializers.ChapterSerializer
+    queryset=models.Review.objects.all()
+    
     def perform_create(self, serializer):
         return super().perform_create(serializer)
     
